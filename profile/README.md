@@ -1,3 +1,4 @@
+Fast sustaniable Continuous Integration enabling Preview Deployments
 
 ### Basics
 * [open-abap-core](https://github.com/open-abap/open-abap-core) Basics
