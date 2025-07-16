@@ -1,12 +1,12 @@
-## Hi there 👋
 
-<!--
+### Basics
+* [open-abap-core](https://github.com/open-abap/open-abap-core) Basics
+* [open-abap-bal](https://github.com/open-abap/open-abap-bal) Business Application Logging
+* [open-abap-deprecated](https://github.com/open-abap/open-abap-deprecated) 👷
+* [open-abap-ssh](https://github.com/open-abap/open-abap-ssh) 👷
 
-**Here are some ideas to get you started:**
-
-🙋‍♀️ A short introduction - what is your organization all about?
-🌈 Contribution guidelines - how can the community get involved?
-👩‍💻 Useful resources - where can the community find your docs? Is there anything else the community should know?
-🍿 Fun facts - what does your team eat for breakfast?
-🧙 Remember, you can do mighty things with the power of [Markdown](https://docs.github.com/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)
--->
+### Extras
+* [open-abap-gui](https://github.com/open-abap/open-abap-gui)
+* [open-abap-odata](https://github.com/open-abap/open-abap-odata)
+* [open-abap-rap](https://github.com/open-abap/open-abap-rap)
+* [open-abap-pdf](https://github.com/open-abap/open-abap-pdf) 👷
