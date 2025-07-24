@@ -10,5 +10,6 @@ Fast sustainable Continuous Integration enabling Preview Deployments
 * [open-abap-gui](https://github.com/open-abap/open-abap-gui)
 * [open-abap-odata](https://github.com/open-abap/open-abap-odata)
 * [open-abap-rap](https://github.com/open-abap/open-abap-rap)
+* [open-abap-xco](https://github.com/open-abap/open-abap-xco) 👷
 * [open-abap-brf](https://github.com/open-abap/open-abap-brf) 👷
 * [open-abap-pdf](https://github.com/open-abap/open-abap-pdf) 👷
