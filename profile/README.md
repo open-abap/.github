@@ -13,4 +13,4 @@ Fast sustainable Continuous Integration enabling Preview Deployments
 * [open-abap-brf](https://github.com/open-abap/open-abap-brf) 👷
 * [open-abap-pdf](https://github.com/open-abap/open-abap-pdf) 👷
 * [open-abap-ssh](https://github.com/open-abap/open-abap-ssh) 👷
-* [open-abap-ssh](https://github.com/open-abap/open-abap-seo) 👷
+* [open-abap-seo](https://github.com/open-abap/open-abap-seo) 👷
