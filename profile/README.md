@@ -4,7 +4,6 @@ Fast sustainable Continuous Integration enabling Preview Deployments
 * [open-abap-core](https://github.com/open-abap/open-abap-core) Basics
 * [open-abap-bal](https://github.com/open-abap/open-abap-bal) Business Application Logging
 * [open-abap-deprecated](https://github.com/open-abap/open-abap-deprecated) 👷
-* [open-abap-ssh](https://github.com/open-abap/open-abap-ssh) 👷
 
 ### Extras
 * [open-abap-gui](https://github.com/open-abap/open-abap-gui)
@@ -13,3 +12,5 @@ Fast sustainable Continuous Integration enabling Preview Deployments
 * [open-abap-xco](https://github.com/open-abap/open-abap-xco) 👷
 * [open-abap-brf](https://github.com/open-abap/open-abap-brf) 👷
 * [open-abap-pdf](https://github.com/open-abap/open-abap-pdf) 👷
+* [open-abap-ssh](https://github.com/open-abap/open-abap-ssh) 👷
+* [open-abap-ssh](https://github.com/open-abap/open-abap-seo) 👷
