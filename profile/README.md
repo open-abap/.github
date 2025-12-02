@@ -6,15 +6,17 @@ Fast sustainable Continuous Integration enabling Preview Deployments
 * [open-abap-deprecated](https://github.com/open-abap/open-abap-deprecated) 👷
 
 ### Extras
-* [open-abap-gui](https://github.com/open-abap/open-abap-gui)
+* [open-abap-gui](https://github.com/open-abap/open-abap-gui) GUI scaffolding
 * [open-abap-odata](https://github.com/open-abap/open-abap-odata)
 * [open-abap-rap](https://github.com/open-abap/open-abap-rap)
-* [open-abap-xco](https://github.com/open-abap/open-abap-xco) 👷
-* [open-abap-rest](https://github.com/open-abap/open-abap-rest) 👷
-* [open-abap-adt](https://github.com/open-abap/open-abap-adt) 👷
-* [open-abap-brf](https://github.com/open-abap/open-abap-brf) 👷
-* [open-abap-pdf](https://github.com/open-abap/open-abap-pdf) 👷
-* [open-abap-ssh](https://github.com/open-abap/open-abap-ssh) 👷
-* [open-abap-seo](https://github.com/open-abap/open-abap-seo) 👷
-* [open-abap-seo](https://github.com/open-abap/open-abap-lock) 👷
-* [open-abap-seo](https://github.com/open-abap/open-abap-jobs) 👷
+* [open-abap-xco](https://github.com/open-abap/open-abap-xco) 👷 SCO
+* [open-abap-rest](https://github.com/open-abap/open-abap-rest) 👷 REST classes
+* [open-abap-adt](https://github.com/open-abap/open-abap-adt) 👷 ADT REST scaffolding
+* [open-abap-brf](https://github.com/open-abap/open-abap-brf) 👷 BRF+
+* [open-abap-seo](https://github.com/open-abap/open-abap-seo) 👷 ABAP OO Dev Tools
+* [open-abap-lock](https://github.com/open-abap/open-abap-lock) 👷 Concurrent locking
+* [open-abap-jobs](https://github.com/open-abap/open-abap-jobs) 👷 Background jobs
+
+### Not Started
+* [open-abap-pdf](https://github.com/open-abap/open-abap-pdf) 😅 PDF Generation and Manipulation
+* [open-abap-ssh](https://github.com/open-abap/open-abap-ssh) 😅 SSH
