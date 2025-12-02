@@ -12,7 +12,6 @@ Fast sustainable Continuous Integration enabling Preview Deployments
 * [open-abap-xco](https://github.com/open-abap/open-abap-xco) 👷 XCO
 * [open-abap-rest](https://github.com/open-abap/open-abap-rest) 👷 REST classes
 * [open-abap-adt](https://github.com/open-abap/open-abap-adt) 👷 ADT REST scaffolding
-* [open-abap-brf](https://github.com/open-abap/open-abap-brf) 👷 BRF+
 * [open-abap-seo](https://github.com/open-abap/open-abap-seo) 👷 ABAP OO Dev Tools
 * [open-abap-lock](https://github.com/open-abap/open-abap-lock) 👷 Concurrent locking/enqueue
 * [open-abap-jobs](https://github.com/open-abap/open-abap-jobs) 👷 Background jobs
@@ -20,3 +19,4 @@ Fast sustainable Continuous Integration enabling Preview Deployments
 ### Not Started
 * [open-abap-pdf](https://github.com/open-abap/open-abap-pdf) 😅 PDF Generation and Manipulation
 * [open-abap-ssh](https://github.com/open-abap/open-abap-ssh) 😅 Secure Shell (SSH)
+* [open-abap-brf](https://github.com/open-abap/open-abap-brf) 😅 BRF+
