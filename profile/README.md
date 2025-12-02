@@ -14,7 +14,7 @@ Fast sustainable Continuous Integration enabling Preview Deployments
 * [open-abap-adt](https://github.com/open-abap/open-abap-adt) 👷 ADT REST scaffolding
 * [open-abap-brf](https://github.com/open-abap/open-abap-brf) 👷 BRF+
 * [open-abap-seo](https://github.com/open-abap/open-abap-seo) 👷 ABAP OO Dev Tools
-* [open-abap-lock](https://github.com/open-abap/open-abap-lock) 👷 Concurrent locking
+* [open-abap-lock](https://github.com/open-abap/open-abap-lock) 👷 Concurrent locking/enqueue
 * [open-abap-jobs](https://github.com/open-abap/open-abap-jobs) 👷 Background jobs
 
 ### Not Started
