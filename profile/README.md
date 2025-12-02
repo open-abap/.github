@@ -9,7 +9,7 @@ Fast sustainable Continuous Integration enabling Preview Deployments
 * [open-abap-gui](https://github.com/open-abap/open-abap-gui) GUI scaffolding
 * [open-abap-odata](https://github.com/open-abap/open-abap-odata)
 * [open-abap-rap](https://github.com/open-abap/open-abap-rap)
-* [open-abap-xco](https://github.com/open-abap/open-abap-xco) 👷 SCO
+* [open-abap-xco](https://github.com/open-abap/open-abap-xco) 👷 XCO
 * [open-abap-rest](https://github.com/open-abap/open-abap-rest) 👷 REST classes
 * [open-abap-adt](https://github.com/open-abap/open-abap-adt) 👷 ADT REST scaffolding
 * [open-abap-brf](https://github.com/open-abap/open-abap-brf) 👷 BRF+
@@ -19,4 +19,4 @@ Fast sustainable Continuous Integration enabling Preview Deployments
 
 ### Not Started
 * [open-abap-pdf](https://github.com/open-abap/open-abap-pdf) 😅 PDF Generation and Manipulation
-* [open-abap-ssh](https://github.com/open-abap/open-abap-ssh) 😅 SSH
+* [open-abap-ssh](https://github.com/open-abap/open-abap-ssh) 😅 Secure Shell (SSH)
