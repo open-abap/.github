@@ -15,7 +15,7 @@ Fast sustainable Continuous Integration enabling Preview Deployments
 * [open-abap-seo](https://github.com/open-abap/open-abap-seo) 👷 ABAP OO Dev Tools
 * [open-abap-lock](https://github.com/open-abap/open-abap-lock) 👷 Concurrent locking/enqueue
 * [open-abap-jobs](https://github.com/open-abap/open-abap-jobs) 👷 Background jobs
-* [open-abap-jobs](https://github.com/open-abap/open-abap-jobs) 👷 Code Inspector / ATC
+* [open-abap-ci](https://github.com/open-abap/open-abap-ci) 👷 Code Inspector / ATC
 
 ### Not Started
 * [open-abap-pdf](https://github.com/open-abap/open-abap-pdf) 😅 PDF Generation and Manipulation
