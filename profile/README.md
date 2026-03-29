@@ -4,7 +4,7 @@ Fast sustainable Continuous Integration enabling Preview Deployments
 * [open-abap-core](https://github.com/open-abap/open-abap-core) Basics
 * [open-abap-bal](https://github.com/open-abap/open-abap-bal) Business Application Logging
 * [open-abap-deprecated](https://github.com/open-abap/open-abap-deprecated) 👷
-* * [open-abap-pdf](https://github.com/open-abap/open-abap-pdf) 😅 PDF Generation and Manipulation
+* [open-abap-pdf](https://github.com/open-abap/open-abap-pdf) 😅 PDF Generation and Manipulation
 
 ### Extras
 * [open-abap-gui](https://github.com/open-abap/open-abap-gui) GUI scaffolding
