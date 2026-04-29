@@ -17,6 +17,7 @@ Fast sustainable Continuous Integration enabling Preview Deployments
 * [open-abap-lock](https://github.com/open-abap/open-abap-lock) 👷 Concurrent locking/enqueue
 * [open-abap-jobs](https://github.com/open-abap/open-abap-jobs) 👷 Background jobs
 * [open-abap-ci](https://github.com/open-abap/open-abap-ci) 👷 Code Inspector / ATC
+* [open-abap-proxy](https://github.com/open-abap/open-abap-proxy) 👷 Proxy
 
 ### Not Started
 * [open-abap-ssh](https://github.com/open-abap/open-abap-ssh) 😅 Secure Shell (SSH)
