@@ -19,6 +19,10 @@ Fast sustainable Continuous Integration enabling Preview Deployments
 * [open-abap-ci](https://github.com/open-abap/open-abap-ci) 👷 Code Inspector / ATC
 * [open-abap-proxy](https://github.com/open-abap/open-abap-proxy) 👷 Proxy
 
+### Misc
+
+* [express-icf-shim](https://github.com/open-abap/express-icf-shim)
+
 ### Not Started
 * [open-abap-ssh](https://github.com/open-abap/open-abap-ssh) 😅 Secure Shell (SSH)
 * [open-abap-brf](https://github.com/open-abap/open-abap-brf) 😅 BRF+
