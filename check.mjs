@@ -24,8 +24,16 @@ for (const repo of repos) {
   const target = join(DESTINATION, repo.name);
   const findings = [];
 
-  console.log(`Clone ${repo.name}`);
+  console.log(`Clone ${repo.cloneUrl}`);
   await run("git", ["clone", "--quiet", "--depth", "1", repo.cloneUrl, target]);
+
+  if ((await countFiles(target, 2)) <= 2) {
+    continue;
+  }
+
+  if (!existsSync(join(target, ".npmrc"))) {
+    findings.push("Missing .npmrc");
+  }
 
   if (!existsSync(join(target, "package-lock.json"))) {
     findings.push("Missing package-lock.json");
@@ -76,6 +84,31 @@ async function readRepositoriesFromReadme(readme) {
   }
 
   return [...repositories.values()];
+}
+
+async function countFiles(directory, stopAfter) {
+  let count = 0;
+  const entries = await readdir(directory, { withFileTypes: true });
+
+  for (const entry of entries) {
+    if (entry.name === ".git") {
+      continue;
+    }
+
+    const entryPath = join(directory, entry.name);
+
+    if (entry.isDirectory()) {
+      count += await countFiles(entryPath, stopAfter - count);
+    } else if (entry.isFile()) {
+      count += 1;
+    }
+
+    if (count > stopAfter) {
+      break;
+    }
+  }
+
+  return count;
 }
 
 async function hasPrivatePackageJson(repositoryPath) {
