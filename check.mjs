@@ -49,6 +49,11 @@ for (const repo of repos) {
     findings.push('Missing "errorOnDuplicateFilenames": true in abaplint.jsonc');
   }
 
+  const workflowsMissingTimeouts = await workflowYmlFilesWithoutTimeout(target);
+  for (const workflow of workflowsMissingTimeouts) {
+    findings.push(`Missing timeout-minutes in .github/workflows/${workflow}`);
+  }
+
   printFindings(repo.name, findings);
 }
 
@@ -126,6 +131,30 @@ async function hasErrorOnDuplicateFilenames(repositoryPath) {
   const abaplintPath = join(repositoryPath, "abaplint.jsonc");
   const abaplintJsonc = stripJsonComments(await readFile(abaplintPath, "utf8"));
   return /"errorOnDuplicateFilenames"\s*:\s*true\b/.test(abaplintJsonc);
+}
+
+async function workflowYmlFilesWithoutTimeout(repositoryPath) {
+  const workflowsPath = join(repositoryPath, ".github", "workflows");
+
+  if (!existsSync(workflowsPath)) {
+    return [];
+  }
+
+  const entries = await readdir(workflowsPath, { withFileTypes: true });
+  const missingTimeouts = [];
+
+  for (const entry of entries) {
+    if (!entry.isFile() || !entry.name.endsWith(".yml")) {
+      continue;
+    }
+
+    const content = await readFile(join(workflowsPath, entry.name), "utf8");
+    if (!content.includes("timeout-minutes")) {
+      missingTimeouts.push(entry.name);
+    }
+  }
+
+  return missingTimeouts;
 }
 
 function printFindings(repositoryName, findings) {
