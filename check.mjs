@@ -19,18 +19,29 @@ if (repos.length === 0) {
 }
 
 console.log(`Found ${repos.length} repositories in ${README}.`);
-console.log(`Destination: ${DESTINATION}`);
 
 for (const repo of repos) {
   const target = join(DESTINATION, repo.name);
+  const findings = [];
 
-  if (existsSync(target)) {
-    console.log(`skip ${repo.name}: ${target} already exists`);
-    continue;
+  console.log(`Clone ${repo.name}`);
+  await run("git", ["clone", "--quiet", "--depth", "1", repo.cloneUrl, target]);
+
+  if (!existsSync(join(target, "package-lock.json"))) {
+    findings.push("Missing package-lock.json");
   }
 
-  console.log(`clone ${repo.name}`);
-  await run("git", ["clone", "--quiet", "--depth", "1", repo.cloneUrl, target]);
+  if (!(await hasPrivatePackageJson(target))) {
+    findings.push('Missing "private": true in package.json');
+  }
+
+  if (!existsSync(join(target, "abaplint.jsonc"))) {
+    findings.push("Missing abaplint.jsonc");
+  } else if (!(await hasErrorOnDuplicateFilenames(target))) {
+    findings.push('Missing "errorOnDuplicateFilenames": true in abaplint.jsonc');
+  }
+
+  printFindings(repo.name, findings);
 }
 
 async function clearDestination(destination) {
@@ -65,6 +76,82 @@ async function readRepositoriesFromReadme(readme) {
   }
 
   return [...repositories.values()];
+}
+
+async function hasPrivatePackageJson(repositoryPath) {
+  const packageJsonPath = join(repositoryPath, "package.json");
+
+  if (!existsSync(packageJsonPath)) {
+    return false;
+  }
+
+  const packageJson = JSON.parse(await readFile(packageJsonPath, "utf8"));
+  return packageJson.private === true;
+}
+
+async function hasErrorOnDuplicateFilenames(repositoryPath) {
+  const abaplintPath = join(repositoryPath, "abaplint.jsonc");
+  const abaplintJsonc = stripJsonComments(await readFile(abaplintPath, "utf8"));
+  return /"errorOnDuplicateFilenames"\s*:\s*true\b/.test(abaplintJsonc);
+}
+
+function printFindings(repositoryName, findings) {
+  for (const finding of findings) {
+    console.log(`  - ${finding}`);
+  }
+}
+
+function stripJsonComments(content) {
+  let result = "";
+  let inString = false;
+  let stringQuote = "";
+  let escaped = false;
+
+  for (let i = 0; i < content.length; i += 1) {
+    const char = content[i];
+    const next = content[i + 1];
+
+    if (inString) {
+      result += char;
+
+      if (escaped) {
+        escaped = false;
+      } else if (char === "\\") {
+        escaped = true;
+      } else if (char === stringQuote) {
+        inString = false;
+      }
+      continue;
+    }
+
+    if (char === '"' || char === "'") {
+      inString = true;
+      stringQuote = char;
+      result += char;
+      continue;
+    }
+
+    if (char === "/" && next === "/") {
+      while (i < content.length && content[i] !== "\n") {
+        i += 1;
+      }
+      result += "\n";
+      continue;
+    }
+
+    if (char === "/" && next === "*") {
+      i += 2;
+      while (i < content.length && !(content[i] === "*" && content[i + 1] === "/")) {
+        i += 1;
+      }
+      i += 1;
+      continue;
+    }
+
+    result += char;
+  }
+
+  return result;
 }
 
 async function ensureGitIsAvailable() {
