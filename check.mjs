@@ -8,6 +8,8 @@ import { spawn } from "node:child_process";
 const ORG = "open-abap";
 const DESTINATION = "repositories";
 const README = "profile/README.md";
+const GITHUB_API = "https://api.github.com";
+const LICENSE_CLA_CHECK_PATTERN = /\b(?:license|cla)\b/i;
 
 await ensureGitIsAvailable();
 await clearDestination(DESTINATION);
@@ -27,7 +29,11 @@ for (const repo of repos) {
   console.log(`Clone ${repo.cloneUrl}`);
   await run("git", ["clone", "--quiet", "--depth", "1", repo.cloneUrl, target]);
 
+  const pullRequestFeedback = await latestPullRequestLicenseClaFeedback(repo.name);
+  findings.push(...pullRequestFeedback);
+
   if ((await countFiles(target, 2)) <= 2) {
+    printFindings(repo.name, findings);
     continue;
   }
 
@@ -155,6 +161,88 @@ async function workflowYmlFilesWithoutTimeout(repositoryPath) {
   }
 
   return missingTimeouts;
+}
+
+async function latestPullRequestLicenseClaFeedback(repositoryName) {
+  const pullRequest = await latestPullRequest(repositoryName);
+
+  if (!pullRequest) {
+    return [];
+  }
+
+  const statuses = await statusesForCommit(repositoryName, pullRequest.head.sha);
+  const licenseClaStatuses = latestStatusesByContext(statuses).filter((status) =>
+    LICENSE_CLA_CHECK_PATTERN.test(status.context),
+  );
+
+  if (licenseClaStatuses.length === 0) {
+    return [`Latest PR #${pullRequest.number}: no license/CLA statuses found`];
+  }
+
+  return licenseClaStatuses
+    .filter((status) => !isSignedClaStatus(status))
+    .map((status) => {
+      const feedback = status.description?.trim();
+      const details = feedback ? `: ${feedback}` : ": no status feedback";
+      return `Latest PR #${pullRequest.number}: status ${status.context} (${status.state})${details}`;
+    });
+}
+
+async function latestPullRequest(repositoryName) {
+  const pullRequests = await githubJson(
+    `/repos/${ORG}/${repositoryName}/pulls?state=all&sort=created&direction=desc&per_page=1`,
+  );
+  return pullRequests[0];
+}
+
+async function statusesForCommit(repositoryName, commitSha) {
+  return githubJson(`/repos/${ORG}/${repositoryName}/commits/${commitSha}/statuses?per_page=100`);
+}
+
+function latestStatusesByContext(statuses) {
+  const latest = new Map();
+
+  for (const status of statuses) {
+    if (!latest.has(status.context)) {
+      latest.set(status.context, status);
+    }
+  }
+
+  return [...latest.values()];
+}
+
+function isSignedClaStatus(status) {
+  return (
+    LICENSE_CLA_CHECK_PATTERN.test(status.context) &&
+    status.state === "success" &&
+    status.description?.trim().toLowerCase() === "contributor license agreement is signed."
+  );
+}
+
+async function githubJson(pathname) {
+  const headers = {
+    Accept: "application/vnd.github+json",
+    "User-Agent": "open-abap-check",
+    "X-GitHub-Api-Version": "2022-11-28",
+  };
+
+  const token = process.env.GITHUB_TOKEN ?? process.env.GH_TOKEN;
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${GITHUB_API}${pathname}`, { headers });
+
+  if (!response.ok) {
+    const body = await response.text();
+    const tokenHint =
+      response.status === 403 && body.includes("rate limit")
+        ? " Set GITHUB_TOKEN or GH_TOKEN for a higher API rate limit."
+        : "";
+    throw new Error(`GitHub API ${pathname} failed with ${response.status}: ${body}${tokenHint}`);
+  }
+
+  return response.json();
 }
 
 function printFindings(repositoryName, findings) {
