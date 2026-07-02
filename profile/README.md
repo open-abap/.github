@@ -18,6 +18,10 @@ Fast sustainable Continuous Integration enabling Preview Deployments
 * [open-abap-jobs](https://github.com/open-abap/open-abap-jobs) 👷 Background jobs
 * [open-abap-ci](https://github.com/open-abap/open-abap-ci) 👷 Code Inspector / ATC
 * [open-abap-proxy](https://github.com/open-abap/open-abap-proxy) 👷 Proxy
+* [open-abap-parallel](https://github.com/open-abap/open-abap-parallel) 👷 wip
+* [open-abap-sadl](https://github.com/open-abap/open-abap-sadl) 👷 wip
+* [open-abap-mbc](https://github.com/open-abap/open-abap-mbc) 👷 wip
+* [open-abap-cds](https://github.com/open-abap/open-abap-cds) 👷 wip
 
 ### Misc
 
