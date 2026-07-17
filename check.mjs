@@ -9,6 +9,8 @@ const ORG = "open-abap";
 const DESTINATION = "repositories";
 const README = "profile/README.md";
 const GITHUB_API = "https://api.github.com";
+const ABAPLINT_REGRESSION_RUN_URL =
+  "https://raw.githubusercontent.com/abaplint/abaplint/main/.github/regression/run.js";
 const LICENSE_CLA_CHECK_PATTERN = /\b(?:license|cla)\b/i;
 
 await ensureGitIsAvailable();
@@ -19,6 +21,7 @@ const repos = await readRepositoriesFromReadme(README);
 if (repos.length === 0) {
   throw new Error(`No ${ORG} repository links found in ${README}.`);
 }
+const abaplintRegressionRepositories = await readAbaplintRegressionRepositories();
 
 console.log(`Found ${repos.length} repositories in ${README}.`);
 
@@ -31,6 +34,10 @@ for (const repo of repos) {
 
   const pullRequestFeedback = await latestPullRequestLicenseClaFeedback(repo.name);
   findings.push(...pullRequestFeedback);
+
+  if (!abaplintRegressionRepositories.has(`${ORG}/${repo.name}`)) {
+    findings.push("Missing from abaplint regression run.js");
+  }
 
   if ((await countFiles(target, 2)) <= 2) {
     printFindings(repo.name, findings);
@@ -95,6 +102,28 @@ async function readRepositoriesFromReadme(readme) {
   }
 
   return [...repositories.values()];
+}
+
+async function readAbaplintRegressionRepositories() {
+  const response = await fetch(ABAPLINT_REGRESSION_RUN_URL);
+
+  if (!response.ok) {
+    throw new Error(
+      `Fetching ${ABAPLINT_REGRESSION_RUN_URL} failed with ${response.status}: ${await response.text()}`,
+    );
+  }
+
+  const content = stripJsonComments(await response.text());
+  const repositoriesArray = content.match(/const\s+repos\s*=\s*\[([\s\S]*?)\]\s*;/);
+
+  if (!repositoriesArray) {
+    throw new Error(`No repositories array found in ${ABAPLINT_REGRESSION_RUN_URL}.`);
+  }
+
+  const repositories = repositoriesArray[1].matchAll(
+    /["']([A-Za-z0-9._-]+\/[A-Za-z0-9._-]+)["']/g,
+  );
+  return new Set([...repositories].map((match) => match[1]));
 }
 
 async function countFiles(directory, stopAfter) {
