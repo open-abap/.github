@@ -1,0 +1,11 @@
+{
+  "name": "open-abap.github",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dependencies": "node dependencies.mjs"
+  },
+  "dependencies": {
+    "@resvg/resvg-js": "^2.6.2"
+  }
+}

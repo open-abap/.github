@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
 import { readFile } from "node:fs/promises";
-import { writeDependencyTree } from "./dependency-tree.mjs";
+import { writeDependencyGraph } from "./dependency-tree.mjs";
 
 const ORG = "open-abap";
 const README = "profile/README.md";
 const GITHUB_RAW = "https://raw.githubusercontent.com";
-const DEPENDENCY_TREE = "dependencies.png";
+const DEPENDENCY_GRAPH = "dependencies.png";
 
 const repositories = await readRepositoriesFromReadme(README);
 
@@ -41,8 +41,8 @@ for (const dependency of dependencies) {
   console.log(`- ${dependency.from} -> ${dependency.to}`);
 }
 
-await writeDependencyTree(DEPENDENCY_TREE, dependencies);
-console.log(`\nDependency tree written to ${DEPENDENCY_TREE}`);
+await writeDependencyGraph(DEPENDENCY_GRAPH, dependencies);
+console.log(`\nDependency graph written to ${DEPENDENCY_GRAPH}`);
 
 async function readRepositoriesFromReadme(readme) {
   const content = await readFile(readme, "utf8");
