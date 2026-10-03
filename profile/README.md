@@ -30,3 +30,7 @@ Fast sustainable Continuous Integration enabling Preview Deployments
 
 ### Not Started
 * [open-abap-brf](https://github.com/open-abap/open-abap-brf) 😅 BRF+
+
+### Dependencies
+![open-abap dependency graph](https://raw.githubusercontent.com/open-abap/.github/main/dependencies.png)
+
