@@ -19,17 +19,16 @@ Fast sustainable Continuous Integration enabling Preview Deployments
 * [open-abap-proxy](https://github.com/open-abap/open-abap-proxy) Proxy
 * [open-abap-parallel](https://github.com/open-abap/open-abap-parallel) Parallel processing
 * [open-abap-sadl](https://github.com/open-abap/open-abap-sadl) SADL
-* [open-abap-mbc](https://github.com/open-abap/open-abap-mbc) MBC
+* [open-abap-mbc](https://github.com/open-abap/open-abap-mbc) Business Configuration
 * [open-abap-cds](https://github.com/open-abap/open-abap-cds) CDS
+* [open-abap-stc](https://github.com/open-abap/open-abap-stc) Technical Configurations
+* [open-abap-brf](https://github.com/open-abap/open-abap-brf) 😅 BRF+
 
 ### Misc
 
 * [express-icf-shim](https://github.com/open-abap/express-icf-shim)
 * [open-abap-ssh](https://github.com/open-abap/open-abap-ssh) 😅 Secure Shell (SSH)
 * [open-abap-pdf](https://github.com/open-abap/open-abap-pdf) 😅 PDF Generation and Manipulation
-
-### Not Started
-* [open-abap-brf](https://github.com/open-abap/open-abap-brf) 😅 BRF+
 
 ### Dependencies
 ![open-abap dependency graph](https://raw.githubusercontent.com/open-abap/.github/main/dependencies.png)
