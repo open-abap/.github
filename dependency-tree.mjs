@@ -3,6 +3,11 @@ import { Resvg } from "@resvg/resvg-js";
 
 const FONT = `-apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif`;
 const PREFIX = "open-abap-";
+// leaves sharing a single dependency are drawn as one grid once there are this many
+const GROUP_MIN_SIZE = 4;
+const GROUP_PADDING = 16;
+const GROUP_HEADER = 36;
+const MAX_GROUP_COLUMNS = 8;
 
 export async function writeDependencyGraph(filename, dependencies) {
   const boxHeight = 56;
@@ -19,17 +24,25 @@ export async function writeDependencyGraph(filename, dependencies) {
       label(name, layer) !== name ? Math.ceil(PREFIX.length * 5.6) + 28 : 0,
       dependents * arrowSpacing + 24,
     );
-  const { nodes, edges } = graphLayout(dependencies, boxWidth, boxGap);
-  const maxLayer = Math.max(...nodes.map((node) => node.layer), 0);
-  const maxRight = Math.max(...nodes.map((node) => node.x + node.width), 0);
-  const width = Math.max(margin * 2 + maxRight, 560);
-  const height = headerHeight + maxLayer * (boxHeight + layerGap) + boxHeight + margin;
+  const top = (node) => headerHeight + node.layer * (boxHeight + layerGap);
+
+  // try each column count for the grouped leaves, keep the most square image
+  let best;
+  for (let columns = 1; columns <= MAX_GROUP_COLUMNS; columns += 1) {
+    const layout = graphLayout(dependencies, { boxWidth, boxHeight, gap: boxGap, columns });
+    const maxRight = Math.max(...layout.nodes.map((node) => node.x + node.width), 0);
+    const width = Math.max(margin * 2 + maxRight, 560);
+    const height = Math.max(...layout.nodes.map((node) => top(node) + node.height), 0) + margin;
+    const score = Math.abs(Math.log(width / height));
+    if (best === undefined || score < best.score) {
+      best = { ...layout, maxRight, width, height, score };
+    }
+  }
+  const { nodes, edges, maxRight, width, height } = best;
   const offset = (width - maxRight) / 2;
 
   const byName = new Map(nodes.map((node) => [node.name, node]));
   const left = (node) => offset + node.x;
-  const top = (node) => headerHeight + node.layer * (boxHeight + layerGap);
-
   const center = (node) => left(node) + node.width / 2;
 
   // arrows go from the dependent up to the dependency, tips spread along its bottom edge
@@ -43,30 +56,45 @@ export async function writeDependencyGraph(filename, dependencies) {
       const x1 = center(dependent);
       const y1 = top(dependent);
       const x2 = center(dependency) + (index - (dependents.length - 1) / 2) * arrowSpacing;
-      const y2 = top(dependency) + boxHeight + 6;
+      const y2 = top(dependency) + dependency.height + 6;
       const bend = (y1 - y2) / 2;
       return `    <path d="M ${x1} ${y1} C ${x1} ${y1 - bend}, ${x2} ${y2 + bend}, ${x2} ${y2}" />`;
     });
   });
 
-  const boxes = nodes.map((node) => {
-    const x = left(node);
-    const y = top(node);
-    const middle = x + node.width / 2;
-    const name = label(node.name, node.layer);
+  const box = (name, layer, x, y, boxWidth) => {
+    const middle = x + boxWidth / 2;
+    const text = label(name, layer);
     // shortened names get the prefix as a small line above
-    const text =
-      name === node.name
-        ? [`      <text x="${middle}" y="${y + boxHeight / 2}">${escapeXml(name)}</text>`]
+    const lines =
+      text === name
+        ? [`      <text x="${middle}" y="${y + boxHeight / 2}">${escapeXml(text)}</text>`]
         : [
             `      <text class="prefix" x="${middle}" y="${y + 16}">${escapeXml(PREFIX)}</text>`,
-            `      <text x="${middle}" y="${y + 37}">${escapeXml(name)}</text>`,
+            `      <text x="${middle}" y="${y + 37}">${escapeXml(text)}</text>`,
           ];
     return [
       `    <g class="node">`,
-      `      <rect x="${x}" y="${y}" width="${node.width}" height="${boxHeight}" rx="8" />`,
-      ...text,
+      `      <rect x="${x}" y="${y}" width="${boxWidth}" height="${boxHeight}" rx="8" />`,
+      ...lines,
       `    </g>`,
+    ].join("\n");
+  };
+
+  const boxes = nodes.map((node) => {
+    const x = left(node);
+    const y = top(node);
+    if (node.group === undefined) {
+      return box(node.name, node.layer, x, y, node.width);
+    }
+    return [
+      `    <g class="group">`,
+      `      <rect x="${x}" y="${y}" width="${node.width}" height="${node.height}" rx="12" />`,
+      `      <text x="${x + GROUP_PADDING}" y="${y + 23}">depends only on ${escapeXml(node.group.parent)}</text>`,
+      `    </g>`,
+      ...node.group.members.map((member) =>
+        box(member.name, node.layer, x + member.x, y + member.y, member.width),
+      ),
     ].join("\n");
   });
 
@@ -86,6 +114,8 @@ export async function writeDependencyGraph(filename, dependencies) {
     .node rect { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1; filter: url(#shadow); }
     .node text { font-size: 20px; font-weight: 600; fill: #0f172a; text-anchor: middle; }
     .node .prefix { font-size: 10px; font-weight: 400; fill: #94a3b8; }
+    .group rect { fill: #eef2f7; stroke: #cbd5e1; stroke-width: 1; stroke-dasharray: 5 4; }
+    .group text { font-size: 13px; fill: #64748b; }
   </style>
   <rect width="${width}" height="${height}" rx="12" fill="#f8fafc" />
   <text class="title" x="${margin}" y="46">open-abap dependency graph</text>
@@ -109,7 +139,7 @@ function label(name, layer) {
   return layer > 0 && name.startsWith(PREFIX) ? name.slice(PREFIX.length) : name;
 }
 
-function graphLayout(dependencies, boxWidth, gap) {
+function graphLayout(dependencies, { boxWidth, boxHeight, gap, columns }) {
   const parents = new Map();
   const nodes = new Set();
 
@@ -144,12 +174,6 @@ function graphLayout(dependencies, boxWidth, gap) {
     directParents.set(child, direct.length > 0 ? direct : dependenciesForNode);
   }
 
-  const dependentCounts = new Map();
-  for (const direct of directParents.values()) {
-    for (const parent of direct) {
-      dependentCounts.set(parent, (dependentCounts.get(parent) ?? 0) + 1);
-    }
-  }
   const layers = new Map();
 
   function layer(name, path = new Set()) {
@@ -177,23 +201,89 @@ function graphLayout(dependencies, boxWidth, gap) {
     layer(node);
   }
 
-  const widths = new Map(
-    [...nodes].map((name) => [
-      name,
-      boxWidth(name, layers.get(name), dependentCounts.get(name) ?? 0),
+  // leaves with a single direct dependency, collected per dependency
+  const hasDependents = new Set([...directParents.values()].flat());
+  const leavesByParent = new Map();
+  for (const name of nodes) {
+    const direct = directParents.get(name) ?? [];
+    if (direct.length === 1 && !hasDependents.has(name)) {
+      leavesByParent.set(direct[0], [...(leavesByParent.get(direct[0]) ?? []), name]);
+    }
+  }
+
+  // units are what the layout places: single nodes, or a group of leaves drawn as a grid
+  const groups = new Map();
+  const unitOf = new Map([...nodes].map((name) => [name, name]));
+  for (const [parent, members] of leavesByParent) {
+    if (members.length < GROUP_MIN_SIZE) {
+      continue;
+    }
+    const name = `group:${parent}`;
+    groups.set(name, { parent, members: members.sort(compareNames) });
+    for (const member of members) {
+      unitOf.set(member, name);
+    }
+  }
+  const units = [...new Set(unitOf.values())];
+  const unitParents = new Map(
+    units.map((unit) => [
+      unit,
+      groups.has(unit) ? [groups.get(unit).parent] : directParents.get(unit) ?? [],
     ]),
   );
-  const size = (name) => widths.get(name);
+  const unitLayers = new Map(
+    units.map((unit) => [
+      unit,
+      groups.has(unit) ? layers.get(groups.get(unit).members[0]) : layers.get(unit),
+    ]),
+  );
+
+  const dependentCounts = new Map();
+  for (const direct of unitParents.values()) {
+    for (const parent of direct) {
+      dependentCounts.set(parent, (dependentCounts.get(parent) ?? 0) + 1);
+    }
+  }
+
+  const sizes = new Map(
+    units.map((unit) => {
+      const unitLayer = unitLayers.get(unit);
+      if (!groups.has(unit)) {
+        return [
+          unit,
+          { width: boxWidth(unit, unitLayer, dependentCounts.get(unit) ?? 0), height: boxHeight },
+        ];
+      }
+      const { members } = groups.get(unit);
+      const cellWidth = Math.max(...members.map((member) => boxWidth(member, unitLayer, 0)));
+      const columnCount = Math.min(columns, members.length);
+      const rowCount = Math.ceil(members.length / columnCount);
+      return [
+        unit,
+        {
+          width: columnCount * cellWidth + (columnCount - 1) * gap + GROUP_PADDING * 2,
+          height: GROUP_HEADER + rowCount * boxHeight + (rowCount - 1) * gap + GROUP_PADDING,
+          members: members.map((member, index) => ({
+            name: member,
+            x: GROUP_PADDING + (index % columnCount) * (cellWidth + gap),
+            y: GROUP_HEADER + Math.floor(index / columnCount) * (boxHeight + gap),
+            width: cellWidth,
+          })),
+        },
+      ];
+    }),
+  );
+  const size = (name) => sizes.get(name).width;
 
   // place each layer close to the average position of its parents, without overlaps
   const positions = new Map();
-  const maxLayer = Math.max(...layers.values(), 0);
+  const maxLayer = Math.max(...unitLayers.values(), 0);
 
   for (let current = 0; current <= maxLayer; current += 1) {
-    const entries = [...nodes]
-      .filter((node) => layers.get(node) === current)
+    const entries = units
+      .filter((unit) => unitLayers.get(unit) === current)
       .map((name) => {
-        const placed = (directParents.get(name) ?? []).filter((parent) => positions.has(parent));
+        const placed = unitParents.get(name).filter((parent) => positions.has(parent));
         const desired =
           placed.length === 0
             ? undefined
@@ -203,6 +293,7 @@ function graphLayout(dependencies, boxWidth, gap) {
       .sort(
         (left, right) =>
           (left.desired ?? Infinity) - (right.desired ?? Infinity) ||
+          Number(groups.has(left.name)) - Number(groups.has(right.name)) ||
           compareNames(left.name, right.name),
       );
 
@@ -230,14 +321,34 @@ function graphLayout(dependencies, boxWidth, gap) {
   }
 
   const start = (name) => positions.get(name) - size(name) / 2;
-  const minStart = Math.min(...[...nodes].map(start));
-  const layoutNodes = [...nodes].map((name) => ({
+
+  // a node alone in its layer is centered over the full span of its dependents
+  for (let current = maxLayer - 1; current >= 0; current -= 1) {
+    const inLayer = units.filter((unit) => unitLayers.get(unit) === current);
+    if (inLayer.length !== 1) {
+      continue;
+    }
+    const dependents = units.filter((unit) => unitParents.get(unit).includes(inLayer[0]));
+    if (dependents.length === 0) {
+      continue;
+    }
+    const spanLeft = Math.min(...dependents.map(start));
+    const spanRight = Math.max(...dependents.map((unit) => start(unit) + size(unit)));
+    positions.set(inLayer[0], (spanLeft + spanRight) / 2);
+  }
+
+  const minStart = Math.min(...units.map(start));
+  const layoutNodes = units.map((name) => ({
     name,
-    layer: layers.get(name),
+    layer: unitLayers.get(name),
     x: Math.round(start(name) - minStart),
     width: size(name),
+    height: sizes.get(name).height,
+    group: groups.has(name)
+      ? { parent: groups.get(name).parent, members: sizes.get(name).members }
+      : undefined,
   }));
-  const edges = [...directParents].flatMap(([child, direct]) =>
+  const edges = [...unitParents].flatMap(([child, direct]) =>
     direct.map((parent) => ({ from: parent, to: child })),
   );
 
