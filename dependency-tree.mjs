@@ -7,7 +7,8 @@ const PREFIX = "open-abap-";
 const GROUP_MIN_SIZE = 4;
 const GROUP_PADDING = 16;
 const GROUP_HEADER = 36;
-const MAX_GROUP_COLUMNS = 8;
+// column counts tried for grouped leaves, the most square image wins
+const GROUP_COLUMNS = [3];
 
 export async function writeDependencyGraph(filename, dependencies) {
   const boxHeight = 56;
@@ -26,9 +27,8 @@ export async function writeDependencyGraph(filename, dependencies) {
     );
   const top = (node) => headerHeight + node.layer * (boxHeight + layerGap);
 
-  // try each column count for the grouped leaves, keep the most square image
   let best;
-  for (let columns = 1; columns <= MAX_GROUP_COLUMNS; columns += 1) {
+  for (const columns of GROUP_COLUMNS) {
     const layout = graphLayout(dependencies, { boxWidth, boxHeight, gap: boxGap, columns });
     const maxRight = Math.max(...layout.nodes.map((node) => node.x + node.width), 0);
     const width = Math.max(margin * 2 + maxRight, 560);
